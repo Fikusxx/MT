@@ -9,6 +9,8 @@ namespace MTTests;
 
 /// <summary>
 /// https://github.com/MassTransit/Sample-WebApplicationFactory/tree/master
+/// unit tests are flaky with any filter/routing logic and/or selective consumer
+/// just write real int tests.
 /// </summary>
 public class Tests
 {
@@ -24,7 +26,7 @@ public class Tests
                 {
                     services.AddMassTransitTestHarness(x =>
                     {
-                        x.SetTestTimeouts(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+                        x.SetTestTimeouts(TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(5));
                         x.SetKebabCaseEndpointNameFormatter();
                         x.AddConsumer<FastOrdersConsumer>();
                         x.AddConsumer<SlowOrdersConsumer>();

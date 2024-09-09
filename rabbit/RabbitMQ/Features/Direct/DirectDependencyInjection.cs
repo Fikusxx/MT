@@ -32,6 +32,8 @@ public static class DirectDependencyInjection
             //     s.RoutingKey = "fast";
             //     s.ExchangeType = ExchangeType.Direct;
             // });
+
+            x.ConcurrentMessageLimit = 5;
         });
 
         cfg.ReceiveEndpoint("slow-orders", x =>

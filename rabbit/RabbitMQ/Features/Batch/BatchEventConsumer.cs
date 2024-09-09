@@ -9,7 +9,7 @@ public sealed record BatchEventConsumer : IConsumer<Batch<BatchEvent>>
         foreach (var t in context.Message)
         {
             var message = t.Message;
-            Console.WriteLine($"Number: {message.Number}");
+            Console.WriteLine($"Number: {message.Number} from consumer: {this.GetAddress():X}");
         }
 
         Thread.Sleep(1000);
@@ -38,5 +38,14 @@ public sealed class BatchEventConsumerDefinition : ConsumerDefinition<BatchEvent
         
         // size of batch thrown at this specific consumers type
         consumerConfigurator.ConcurrentMessageLimit = 10;
+
+        consumerConfigurator.Options<BatchOptions>(opt =>
+        {
+            opt.SetMessageLimit(20)
+                .SetTimeLimit(s: 1)
+                .SetTimeLimitStart(BatchTimeLimitStart.FromLast)
+                // .GroupBy<BatchEvent, string>(x => x.Message.Number)
+                .SetConcurrencyLimit(2);
+        });
     }
 }

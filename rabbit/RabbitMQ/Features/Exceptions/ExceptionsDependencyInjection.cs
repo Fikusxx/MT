@@ -9,7 +9,7 @@ public static class ExceptionsDependencyInjection
         cfg.ReceiveEndpoint("exception", x =>
         {
             x.Consumer<MessageConsumer>();
-            x.ConfigureConsumer<MessageConsumer>(ctx, o => o.UseInMemoryOutbox(ctx));
+            // x.ConfigureConsumer<MessageConsumer>(ctx, o => o.UseInMemoryOutbox(ctx));
 
             // fault notifications are turned off, _error queue still works
             x.PublishFaults = false;
