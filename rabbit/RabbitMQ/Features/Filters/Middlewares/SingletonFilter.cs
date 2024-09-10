@@ -50,6 +50,12 @@ public class SingletonFilter<T> : IFilter<T> where T : class, PipeContext
     public async Task Send(T context, IPipe<T> next)
     {
         await Console.Out.WriteLineAsync($"Filter: Pre | Type: {typeof(T).Name}");
+        
+        if (context is ConsumeContext<FilteredEvent> _)
+        {
+            Console.WriteLine("This is filtered event");
+        }
+
         service.Call();
 
         await next.Send(context);

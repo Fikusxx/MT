@@ -29,10 +29,10 @@ public sealed record FilteredEventConsumeScopeFilter : IFilter<ConsumeContext<Fi
     {
         Console.WriteLine($"{GetType().Name} executed...");
 
-        // if (_scopedService.GetChecked())
-        //     return;
-        //
-        // _scopedService.SetChecked();
+        if (_scopedService.GetChecked())
+            return;
+        
+        _scopedService.SetChecked();
         await next.Send(context);
     }
 
