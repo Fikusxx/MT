@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ", "rabbit\RabbitMQ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTTests", "rabbit\MTTests\MTTests.csproj", "{71220ECF-FA33-43B8-9ABE-29B8DA8D3EFE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafka", "kafka\Kafka\Kafka.csproj", "{C3C2DD15-ACF4-4283-8B6F-257CA19A07AC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,6 +24,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{A907119C-AC80-4375-B18B-8F2F0D4305AC} = {08CC0C40-0B57-4027-BD82-765C74E842CC}
 		{71220ECF-FA33-43B8-9ABE-29B8DA8D3EFE} = {08CC0C40-0B57-4027-BD82-765C74E842CC}
+		{C3C2DD15-ACF4-4283-8B6F-257CA19A07AC} = {58268D2F-A5DC-4DA7-B457-0915B9592A2E}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{A907119C-AC80-4375-B18B-8F2F0D4305AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -32,5 +35,9 @@ Global
 		{71220ECF-FA33-43B8-9ABE-29B8DA8D3EFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71220ECF-FA33-43B8-9ABE-29B8DA8D3EFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71220ECF-FA33-43B8-9ABE-29B8DA8D3EFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3C2DD15-ACF4-4283-8B6F-257CA19A07AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3C2DD15-ACF4-4283-8B6F-257CA19A07AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3C2DD15-ACF4-4283-8B6F-257CA19A07AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3C2DD15-ACF4-4283-8B6F-257CA19A07AC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
