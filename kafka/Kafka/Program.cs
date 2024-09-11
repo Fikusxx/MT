@@ -39,3 +39,13 @@ app.Run();
 // 				{ "sasl.password", "JDpC2zG-1szh1NtFyNEoTQdss_rIgfcH" }
 // 			});
 // });
+
+public static unsafe class ObjectExtensions
+{
+    public static IntPtr GetAddress(this object obj)
+    {
+        TypedReference tr = __makeref(obj);
+        IntPtr ptr = **(IntPtr**)(&tr);
+        return ptr;
+    }
+}

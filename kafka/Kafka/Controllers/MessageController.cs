@@ -6,13 +6,13 @@ using Newtonsoft.Json;
 namespace Kafka.Controllers;
 
 [ApiController]
-[Route("kafka")]
-public class KafkaController : ControllerBase
+[Route("message")]
+public class MessageController : ControllerBase
 {
     private readonly ITopicProducer<KafkaMessage> producer;
     private static readonly Guid Id = Guid.Parse("1441ab2e-7db3-48fe-8b38-f04710823c0e");
 
-    public KafkaController(ITopicProducer<KafkaMessage> producer)
+    public MessageController(ITopicProducer<KafkaMessage> producer)
     {
         this.producer = producer;
     }
@@ -24,8 +24,6 @@ public class KafkaController : ControllerBase
         await producer.Produce(new KafkaMessage(sameId ? Id : Guid.NewGuid(), "Hello World"),
             Pipe.Execute<KafkaSendContext<KafkaMessage>>(ctx =>
             {
-                // For testing
-                // ctx.MessageId = Guid.Parse("");
                 ctx.MessageId = Guid.NewGuid();
 
                 ctx.FaultAddress = new Uri("http://kekw");
@@ -34,12 +32,15 @@ public class KafkaController : ControllerBase
                 ctx.Headers.Set("time", DateTimeOffset.UtcNow);
 
                 // explicitly define the partition
-                //ctx.Partition = 1;
+                // ctx.Partition = 1;
             }));
 
         return Ok();
     }
 
+    /// <summary>
+    /// sameId simulates ConcurrentMessageLimit & ConcurrentDeliveryLimit logic
+    /// </summary>
     [HttpGet]
     [Route("send-many")]
     public async Task<IActionResult> SendMany([FromQuery] bool sameId)
@@ -62,7 +63,7 @@ public class KafkaController : ControllerBase
     {
         var options = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
         var message = new MessageOne("one");
-        var e = new ComplicatedKafkaMessage()
+        var e = new ComplicatedKafkaMessage
         {
             EventId = Guid.NewGuid(),
             EventType = nameof(MessageOne),
@@ -81,7 +82,7 @@ public class KafkaController : ControllerBase
     {
         var options = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
 
-        var e = new ComplicatedKafkaMessage()
+        var e = new ComplicatedKafkaMessage
         {
             EventId = Guid.NewGuid(),
             EventType = nameof(MessageTwo),

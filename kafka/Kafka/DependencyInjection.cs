@@ -1,5 +1,4 @@
 using System.Reflection;
-using Confluent.Kafka;
 using Kafka.Config;
 using MassTransit;
 
@@ -27,6 +26,7 @@ public static class DependencyInjection
                 // rider.AddProducer<string, ComplicatedKafkaMessage>("demo");
                 
                 rider.AddMessageProducer();
+                rider.AddBatchMessageProducer();
 
                 rider.UsingKafka((ctx, cfg) =>
                 {
@@ -44,7 +44,7 @@ public static class DependencyInjection
                     // {
                     //     h.UseSasl(s =>
                     //     {
-                    //         s.SecurityProtocol = SecurityProtocol.SaslPlaintext;
+                    //         s.SecurityProtocol = SecurityProtocol.SaslSsl;
                     //         s.Mechanism = SaslMechanism.Plain;
                     //         s.Username = null;
                     //         s.Password = null;
@@ -55,6 +55,7 @@ public static class DependencyInjection
                     
 
                     cfg.AddMessageEndpoint(ctx);
+                    cfg.AddBatchMessageEndpoint(ctx);
                     cfg.AddExtraEndpoint();
                 });
             });

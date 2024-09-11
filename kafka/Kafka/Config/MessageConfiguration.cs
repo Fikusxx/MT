@@ -6,7 +6,7 @@ using MassTransit;
 
 namespace Kafka.Config;
 
-public static class KafkaConfiguration
+public static class MessageConfiguration
 {
     public static void AddMessageEndpoint(this IKafkaFactoryConfigurator cfg, IRiderRegistrationContext ctx)
     {
@@ -86,7 +86,7 @@ public static class KafkaConfiguration
                 e.ConcurrentConsumerLimit = 1;
 
                 // process only one message per key value within a partition at a time (default)
-                // WILL BREAK ordering unless it's = 1 (default)
+                // WILL BREAK ordering unless it's = 1 (default) if Consumer IS NOT Consumer<Batch> (see batch endpoint)
                 e.ConcurrentDeliveryLimit = 1;
                 e.Consumer<KafkaMessageConsumer>();
                 
@@ -123,6 +123,8 @@ public static class KafkaConfiguration
                 producerCfg.QueueBufferingMaxMessages = 100000; // default 100000
             });
     }
+    
+    
 
     public static void AddExtraEndpoint(this IKafkaFactoryConfigurator cfg)
     {

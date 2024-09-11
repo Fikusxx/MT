@@ -19,7 +19,7 @@ public sealed class KafkaMessageConsumer : IConsumer<KafkaMessage>
 
         var timeValue = time2?.ToLocalTime() ?? DateTimeOffset.UtcNow.ToLocalTime();
 
-        Console.WriteLine($"{messageId} : key {key} partition {partition} offset {offset} at {timeValue}");
+        Console.WriteLine($"{messageId} : key {key} partition {partition} offset {offset} at {timeValue} | Address: {this.GetAddress():X}");
 
         // can be piped or used as is due to high events cohesion for granularity
         // if (retry == 2)
