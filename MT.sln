@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "items", "items", "{430A41E2
 	ProjectSection(SolutionItems) = preProject
 		kafka.yaml = kafka.yaml
 		rabbit.yaml = rabbit.yaml
+		readme.md = readme.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ", "rabbit\RabbitMQ\RabbitMQ.csproj", "{A907119C-AC80-4375-B18B-8F2F0D4305AC}"

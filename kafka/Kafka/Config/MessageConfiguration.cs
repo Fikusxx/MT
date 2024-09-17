@@ -17,8 +17,14 @@ public static class MessageConfiguration
             GroupId = "group_1",
             AutoOffsetReset = AutoOffsetReset.Earliest,
             Acks = Acks.All,
+            
+            // requires manual committing offsets
+            // https://docs.confluent.io/kafka-clients/dotnet/current/overview.html#store-offsets
+            EnableAutoOffsetStore = false, // default true
+            
 
             // auto commits offsets after 5s since 1st poll, then it restarts
+            // https://docs.confluent.io/kafka-clients/dotnet/current/overview.html#auto-offset-commit
             // AutoCommitIntervalMs = 5000,
             // EnableAutoCommit = true,
 
@@ -47,6 +53,12 @@ public static class MessageConfiguration
             topic1Group,
             e =>
             {
+                // https://stackoverflow.com/questions/73045328/kafka-commit-strategies-in-masstransit
+                // correlates to EnableAutoOffsetStore, which makes MT manually commit offset
+                // to its internal buffer and commit offsets to kafka (confluent consumer) only when these thresholds are met
+                e.CheckpointInterval = TimeSpan.FromMinutes(1);
+                e.CheckpointMessageCount = 5000;
+                
                 e.UseKillSwitch(k => k
                     .SetActivationThreshold(10)
                     .SetRestartTimeout(s: 10)
@@ -72,14 +84,14 @@ public static class MessageConfiguration
                 // MT automatically sets the prefetch count = number of CPU processors (cores) 
                 // OR it adds a little buffer based on ConcurrentMessageLimit, unless specified explicitly
                 // Example: ConcurrentMessageLimit = 10, then PrefetchCount will be ~12
-                e.PrefetchCount = 15;
+                e.PrefetchCount = 100;
 
                 // client side
                 // receives up to 10 message per partition, the number of concurrent messages, per partition
                 // Preserve ordering with different keys.
                 // When keys ARE SAME will use ConcurrentDeliveryLimit instead
                 // process up to 10 messages at the same time, aka Parallel.ForEach(messages, _ => { })
-                e.ConcurrentMessageLimit = 10;
+                e.ConcurrentMessageLimit = 50;
 
                 // Number of Confluent Consumer instances within same topic
                 // create up to two Kafka consumers, increases throughput with multiple partitions

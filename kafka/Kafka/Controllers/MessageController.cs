@@ -47,7 +47,7 @@ public class MessageController : ControllerBase
     {
         var tasks = new List<Task>();
 
-        for (var i = 0; i < 20; i++)
+        for (var i = 0; i < 50; i++)
         {
             tasks.Add(producer.Produce(new KafkaMessage(sameId ? Id : Guid.NewGuid(), "Hello World")));
         }

@@ -7,7 +7,7 @@ public sealed class KafkaMessageConsumer : IConsumer<KafkaMessage>
 {
     public async Task Consume(ConsumeContext<KafkaMessage> context)
     {
-        await Task.Delay(1000);
+        await Task.Delay(2000);
         var key = context.GetKey<Guid>();
         var partition = context.Partition();
         var offset = context.Offset();
