@@ -54,9 +54,10 @@ public static class DependencyInjection
                     #endregion
                     
 
-                    cfg.AddMessageEndpoint(ctx);
-                    cfg.AddBatchMessageEndpoint(ctx);
-                    cfg.AddExtraEndpoint();
+                    // cfg.AddMessageEndpoint(ctx);
+                    // cfg.AddBatchMessageEndpoint(ctx);
+                    cfg.AddCloudEventEndpoints(ctx);
+                    // cfg.AddExtraEndpoint();
                 });
             });
         });

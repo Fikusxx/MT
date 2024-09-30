@@ -7,8 +7,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// builder.AddKafka();
-builder.Services.AddHostedService<LagService>();
+builder.AddKafka();
+// builder.Services.AddHostedService<LagService>();
 
 var app = builder.Build();
 
