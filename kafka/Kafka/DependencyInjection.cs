@@ -55,8 +55,8 @@ public static class DependencyInjection
                     
 
                     // cfg.AddMessageEndpoint(ctx);
-                    // cfg.AddBatchMessageEndpoint(ctx);
-                    cfg.AddCloudEventEndpoints(ctx);
+                    cfg.AddBatchMessageEndpoint(ctx);
+                    // cfg.AddCloudEventEndpoints(ctx);
                 });
             });
         });

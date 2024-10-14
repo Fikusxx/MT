@@ -10,16 +10,13 @@ public class BatchKafkaMessageConsumer : IConsumer<Batch<BatchKafkaMessage>>
         foreach (var t in context.Message)
         {
             await Task.Delay(1000);
-            var key = context.GetKey<Guid>();
+            var key = context.GetKey<Guid>(); // receive context key
             var partition = context.Partition();
-            var offset = context.Offset();
-            var messageId = context.MessageId;
-            var retry = context.GetRetryAttempt();
-            var header = context.Headers.Get<string>("key");
-            var value = context.Headers.FirstOrDefault(x => x.Key == "key").Value;
-            var time2 = context.Headers.Get<DateTimeOffset>("time");
+            var offset = context.Offset(); // latest offset of a batch
+            var messageId = context.MessageId; // some bs value, idk
+            var time = context.Headers.Get<DateTimeOffset>("time");
 
-            var timeValue = time2?.ToLocalTime() ?? DateTimeOffset.UtcNow.ToLocalTime();
+            var timeValue = time?.ToLocalTime() ?? DateTimeOffset.UtcNow.ToLocalTime();
 
             Console.WriteLine(
                 $"{messageId} : key {key} partition {partition} offset {offset} at {timeValue} | Address: {this.GetAddress():X}");

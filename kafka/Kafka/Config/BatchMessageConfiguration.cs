@@ -16,6 +16,7 @@ public static class BatchMessageConfiguration
             AutoOffsetReset = AutoOffsetReset.Earliest,
             Acks = Acks.All,
             AllowAutoCreateTopics = true,
+            EnableAutoCommit = false
         };
 
         cfg.TopicEndpoint<Guid, BatchKafkaMessage>(Constants.BatchMessageTopic,
@@ -33,11 +34,12 @@ public static class BatchMessageConfiguration
                     options.ReplicationFactor = 1;
                 });
                 
-                e.PrefetchCount = 20;
+                e.PrefetchCount = 30;
                 
+                // this number will be batch.Length if ids are different
                 e.ConcurrentMessageLimit = 10;
 
-                // this number will go in batches with ordering preserved
+                // this number will be batch.Length with ordering preserved if ids are the same
                 e.ConcurrentDeliveryLimit = 5;
                 e.Consumer<BatchKafkaMessageConsumer>();
             });
