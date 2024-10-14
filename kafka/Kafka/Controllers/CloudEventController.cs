@@ -15,6 +15,7 @@ namespace Kafka.Controllers;
 public class CloudEventController : ControllerBase
 {
     private readonly ITopicProducerProvider topicProducerProvider;
+    private static Uri Uri = new Uri("topic:second");
 
     public CloudEventController(ITopicProducerProvider topicProducerProvider)
     {
@@ -24,8 +25,9 @@ public class CloudEventController : ControllerBase
     [HttpPost("first")]
     public async Task<IActionResult> ProduceToFirstTopic()
     {
-        var producer = topicProducerProvider.GetProducer<Guid, CloudEvent>(new Uri($"topic:{Constants.FirstCouldEventTopic}"));
-        
+        var producer =
+            topicProducerProvider.GetProducer<Guid, CloudEvent>(new Uri($"topic:{Constants.FirstCouldEventTopic}"));
+
         var e = new CloudEvent
         {
             Id = "first-event-id",
@@ -36,20 +38,23 @@ public class CloudEventController : ControllerBase
             Data = new FirstCloudEventData()
         };
         e.SetAttributeFromString("correlationid", Guid.NewGuid().ToString());
-        
-        await producer.Produce(Guid.NewGuid(), e, Pipe.Execute<KafkaSendContext<Guid, CloudEvent>>(context =>
-        {
-            context.ValueSerializer = new CloudEventSerializer();
-        }));
+
+        await producer.Produce(Guid.NewGuid(), e,
+            Pipe.Execute<KafkaSendContext<Guid, CloudEvent>>(context =>
+            {
+                context.ValueSerializer = new CloudEventSerializer();
+            }));
 
         return Ok();
     }
-    
+
     [HttpPost("second")]
     public async Task<IActionResult> ProduceToSecondTopic()
     {
-        var producer = topicProducerProvider.GetProducer<Guid, CloudEvent>(new Uri($"topic:{Constants.SecondCouldEventTopic}"));
-        
+        var producer =
+            // topicProducerProvider.GetProducer<Guid, CloudEvent>(new Uri($"topic:{Constants.SecondCouldEventTopic}"));
+            topicProducerProvider.GetProducer<Guid, CloudEvent>(Uri);
+
         var e = new CloudEvent
         {
             Id = "second-event-id",
@@ -60,17 +65,21 @@ public class CloudEventController : ControllerBase
             Data = new FirstCloudEventData()
         };
         e.SetAttributeFromString("correlationid", Guid.NewGuid().ToString());
-        
-        await producer.Produce(Guid.NewGuid(), e, Pipe.Execute<KafkaSendContext<Guid, CloudEvent>>(context =>
-        {
-            context.ValueSerializer = new CloudEventSerializer();
-        }));
-        
+
+        Console.WriteLine($"Provider address: {topicProducerProvider.GetAddress():X}");
+        Console.WriteLine($"Producer address: {producer.GetAddress():X}");
+
+        await producer.Produce(Guid.NewGuid(), e,
+            Pipe.Execute<KafkaSendContext<Guid, CloudEvent>>(context =>
+            {
+                context.ValueSerializer = new CloudEventSerializer();
+            }));
+
         return Ok();
     }
 }
 
-class CloudEventSerializer: IAsyncSerializer<CloudEvent>
+class CloudEventSerializer : IAsyncSerializer<CloudEvent>
 {
     public Task<byte[]> SerializeAsync(CloudEvent data, SerializationContext context)
     {

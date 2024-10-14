@@ -56,8 +56,12 @@ public static class MessageConfiguration
                 // https://stackoverflow.com/questions/73045328/kafka-commit-strategies-in-masstransit
                 // correlates to EnableAutoOffsetStore, which makes MT manually commit offset
                 // to its internal buffer and commit offsets to kafka (confluent consumer) only when these thresholds are met
-                e.CheckpointInterval = TimeSpan.FromMinutes(1);
-                e.CheckpointMessageCount = 5000;
+                // i.e logic for handling manual commits
+                // if (processedCount < CheckpointMessageCount && pastDue < CheckpointInterval)
+                //          return;
+                // else - commit
+                e.CheckpointInterval = TimeSpan.FromMinutes(1); // has lower priority than CheckpointMessageCount
+                e.CheckpointMessageCount = 5000; // every 5000 handled messages are committed, even if ConcurrentMessageLimit > 5000
                 
                 e.UseKillSwitch(k => k
                     .SetActivationThreshold(10)
@@ -134,34 +138,5 @@ public static class MessageConfiguration
                 producerCfg.QueueBufferingMaxKbytes = 100 * 1024; // default 100mb
                 producerCfg.QueueBufferingMaxMessages = 100000; // default 100000
             });
-    }
-    
-    
-
-    public static void AddExtraEndpoint(this IKafkaFactoryConfigurator cfg)
-    {
-        // var topic2Group = new ConsumerConfig()
-        // {
-        //     GroupId = "group_2",
-        //     AutoOffsetReset = AutoOffsetReset.Earliest
-        // };
-        //
-        // cfg.TopicEndpoint<KafkaMessageError>("error", topic2Group,
-        //     e => { e.ConfigureConsumer<KafkaMessageErrorConsumer>(context); });
-        //
-        //
-        // // TEST
-        // var topic3Group = new ConsumerConfig()
-        // {
-        //     GroupId = "group_3",
-        //     AutoOffsetReset = AutoOffsetReset.Earliest
-        // };
-        //
-        // cfg.TopicEndpoint<ComplicatedKafkaMessage>("demo", topic3Group, e =>
-        // {
-        //     //e.UseConsumeFilter(typeof(MyExceptionFilter<>), context);
-        //
-        //     e.ConfigureConsumer<ComplicatedKafkaMessageConsumer>(context);
-        // });
     }
 }

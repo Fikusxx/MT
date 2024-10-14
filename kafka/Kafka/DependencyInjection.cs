@@ -30,7 +30,7 @@ public static class DependencyInjection
 
                 rider.UsingKafka((ctx, cfg) =>
                 {
-                    //cfg.UseSendFilter(typeof(ContextSendFilter<>), context);
+                    // cfg.UseSendFilter(typeof(ContextSendFilter<>), context);
 
                     cfg.ClientId = Assembly.GetExecutingAssembly().GetName().Name;
 
@@ -57,7 +57,6 @@ public static class DependencyInjection
                     // cfg.AddMessageEndpoint(ctx);
                     // cfg.AddBatchMessageEndpoint(ctx);
                     cfg.AddCloudEventEndpoints(ctx);
-                    // cfg.AddExtraEndpoint();
                 });
             });
         });

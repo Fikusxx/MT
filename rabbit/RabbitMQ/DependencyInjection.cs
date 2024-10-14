@@ -3,6 +3,7 @@ using RabbitMQ.Features.Batch;
 using RabbitMQ.Features.Direct;
 using RabbitMQ.Features.Exceptions;
 using RabbitMQ.Features.Filters;
+using RabbitMQ.Features.Filters.Middlewares;
 
 namespace RabbitMQ;
 
