@@ -36,7 +36,7 @@ public static class MessageConfiguration
 
             // SessionTimeoutMs = 45000,
             // HeartbeatIntervalMs = 3000,
-
+            
             // time a consumer would wait after a poll() that returned no messages
             // a consumer would essentially sit and wait for 300s for any messages to show up
             // MaxPollIntervalMs = 300000,
@@ -60,6 +60,14 @@ public static class MessageConfiguration
                 // if (processedCount < CheckpointMessageCount && pastDue < CheckpointInterval)
                 //          return;
                 // else - commit
+                
+                // only with EnableOffsetStore = false
+                // Example #1:  ConcurrentMessageLimit = 10 && CheckpointMessageCount = 10
+                // if 1st batch of 10 messages are processed and 10th message throws error for eternity
+                // then rest of the messages will be processed, but nothing is committed, until that 10th message stops throwing error.
+                // Example #2: if CheckpointMessageCount = 5 && ConcurrentMessageLimit = 10 - then still if 10th message throws error for eternity
+                // first 5 messages that have been processed will be committed. Rest will not.
+                // Offsets are committed sequentially in order.
                 e.CheckpointInterval = TimeSpan.FromMinutes(1); // has lower priority than CheckpointMessageCount
                 e.CheckpointMessageCount = 5000; // every 5000 handled messages are committed, even if ConcurrentMessageLimit > 5000
                 

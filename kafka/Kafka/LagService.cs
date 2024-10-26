@@ -3,6 +3,9 @@ using Confluent.Kafka.Admin;
 
 namespace Kafka;
 
+/// <summary>
+/// https://www.webdevtutor.net/blog/c-sharp-kafka-get-consumer-lag
+/// </summary>
 public class LagService : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

@@ -7,6 +7,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var sp = builder.Services.BuildServiceProvider();
+sp.GetRequiredService<TimeProvider>();
+
 builder.AddKafka();
 // builder.Services.AddHostedService<LagService>();
 
