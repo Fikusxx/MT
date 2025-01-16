@@ -1,6 +1,5 @@
 using Confluent.Kafka;
 using Kafka.Consumers;
-using Kafka.Filters;
 using Kafka.Messages;
 using MassTransit;
 
