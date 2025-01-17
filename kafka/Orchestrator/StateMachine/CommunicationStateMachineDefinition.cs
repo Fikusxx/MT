@@ -1,4 +1,5 @@
 using MassTransit;
+using Orchestrator.StateMachine.Middlewares;
 
 namespace Orchestrator.StateMachine;
 
@@ -6,23 +7,15 @@ public sealed class CommunicationStateMachineDefinition : SagaDefinition<Communi
 {
     public CommunicationStateMachineDefinition()
     {
-        ConcurrentMessageLimit = 5;
     }
 
-    protected override void ConfigureSaga(
-        IReceiveEndpointConfigurator endpointConfigurator,
+    protected override void ConfigureSaga(IReceiveEndpointConfigurator endpointConfigurator,
         ISagaConfigurator<CommunicationState> sagaConfigurator,
         IRegistrationContext context)
     {
-        // Retrying unhandled exceptions by the saga state machine
-        sagaConfigurator.UseMessageRetry(config =>
-        {
-            config.Interval(3, 1000);
-            // config.Ignore<NotATransientException>();
-        });
-
         // Configuring a filter for all the registered events in the state machine
-        // sagaConfigurator.UseFilter(new SagaLoggingMiddlewareFilter<OrderRequestSagaInstance>());
+        var logger = context.GetRequiredService<ILogger<SagaLoggingMiddlewareFilter<CommunicationState>>>();
+        sagaConfigurator.UseFilter(new SagaLoggingMiddlewareFilter<CommunicationState>(logger));
 
         // endpointConfigurator.ConfigureError(x =>
         // {

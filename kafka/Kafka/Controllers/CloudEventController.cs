@@ -15,7 +15,7 @@ namespace Kafka.Controllers;
 public class CloudEventController : ControllerBase
 {
     private readonly ITopicProducerProvider topicProducerProvider;
-    private static Uri Uri = new Uri("topic:second");
+    private static Uri Uri = new("topic:second");
 
     public CloudEventController(ITopicProducerProvider topicProducerProvider)
     {

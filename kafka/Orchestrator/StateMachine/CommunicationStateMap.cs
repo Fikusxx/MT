@@ -13,7 +13,8 @@ public class CommunicationStateMap : SagaClassMap<CommunicationState>
         // entity.Ignore(x => x.CorrelationId);
         
         
-        entity.Property(x => x.CurrentState).HasMaxLength(64);
+        entity.Property(x => x.CurrentState)
+            .HasMaxLength(64);
         
         // entity.Property(x => x.OrderDate);
         

@@ -1,8 +1,11 @@
+using CloudNative.CloudEvents;
 using Confluent.Kafka;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Orchestrator.Events;
 using Orchestrator.StateMachine;
+using Orchestrator.StateMachine.Cloud;
 
 namespace Orchestrator;
 
@@ -10,8 +13,12 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddTransport(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddOptions<SomeOptions>().BindConfiguration(nameof(SomeOptions));
+
         services.AddMassTransit(massTransit =>
         {
+            var options = massTransit.BuildServiceProvider().GetRequiredService<IOptions<SomeOptions>>().Value;
+
             massTransit.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
             massTransit.AddRider(rider =>
             {
@@ -19,7 +26,15 @@ public static class DependencyInjection
 
                 rider
                     .AddSagaStateMachine<CommunicationStateMachine, CommunicationState>(
-                        typeof(CommunicationStateMachineDefinition))
+                        typeof(CommunicationStateMachineDefinition), (regCtx, sagaCfg) =>
+                        {
+                            // Retrying unhandled exceptions by the saga state machine, same as endpoint UseMessageRetry
+                            sagaCfg.UseMessageRetry(config =>
+                            {
+                                config.Interval(3, 1000);
+                                // config.Ignore<NotATransientException>();
+                            });
+                        })
                     .EntityFrameworkRepository(opt =>
                     {
                         // opt.ConcurrencyMode = ConcurrencyMode.Pessimistic; // uses FOR UPDATE
@@ -36,8 +51,12 @@ public static class DependencyInjection
                         opt.UsePostgres();
                     });
 
-                rider.AddProducer<long, CommunicationEvent>("start");
+                // rider.AddProducer<long, CommunicationEvent>("start");
                 rider.AddProducer<Guid, FinalEvent>("end");
+
+                rider.AddProducer<long, CloudEvent>("start",
+                    new ProducerConfig { BootstrapServers = "localhost" },
+                    (_, cfg) => { cfg.SetValueSerializer(new CloudEventJsonSerializer()); });
 
                 rider.AddProducer<Guid, SendSmsEvent>("sms");
                 rider.AddProducer<Guid, SmsStatusEvent>("sms-status");
@@ -51,6 +70,7 @@ public static class DependencyInjection
                         groupId: "start",
                         configure: topicConfig =>
                         {
+                            topicConfig.SetValueDeserializer(new CommunicationCloudEventJsonDeserializer());
                             topicConfig.AutoOffsetReset = AutoOffsetReset.Earliest;
                             topicConfig.ConfigureSaga<CommunicationState>(ctx);
                         });
@@ -63,7 +83,7 @@ public static class DependencyInjection
                     //         topicConfig.AutoOffsetReset = AutoOffsetReset.Earliest;
                     //         topicConfig.ConfigureSaga<CommunicationState>(ctx);
                     //     });
-                    //
+
                     cfg.TopicEndpoint<long, PushStatusEvent>(
                         topicName: "push-status",
                         groupId: "push-status",
@@ -78,4 +98,9 @@ public static class DependencyInjection
 
         return services;
     }
+}
+
+public class SomeOptions
+{
+    public string Name { get; set; }
 }

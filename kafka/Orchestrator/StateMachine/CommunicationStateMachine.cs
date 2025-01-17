@@ -1,5 +1,6 @@
 using MassTransit;
 using Orchestrator.Events;
+using Orchestrator.StateMachine.Activities;
 
 namespace Orchestrator.StateMachine;
 
@@ -11,14 +12,15 @@ public sealed class CommunicationStateMachine : MassTransitStateMachine<Communic
         CorrelateEvents();
 
         Initially(
-            When(CommunicationEvent)
+            When(CommunicationEvent, x => true)
                 .Then(ctx =>
                 {
+                    LogContext.Info?.Log($"Consuming {nameof(CommunicationEvent)} with Id {ctx.Message.Id}, starting saga...");
                     ctx.Saga.Text = ctx.Message.Text;
                     ctx.Saga.StateId = ctx.Message.Id;
                 })
+                .Activity(x => x.OfType<SendPushRequestActivity>())
                 // .InitializeSaga()
-                // .Activity(config => config.OfType<object>())
                 .TransitionTo(CommunicationStarted));
 
         During(CommunicationStarted,
@@ -30,17 +32,13 @@ public sealed class CommunicationStateMachine : MassTransitStateMachine<Communic
             activityCallback => activityCallback
                 .Finalize());
 
-        // WhenEnter(CommunicationStarted,
-        //     activityCallback => activityCallback
-        //         .Finalize());
-        //
         During(Final,
             Ignore(CommunicationEvent),
             Ignore(PushStatusEvent));
-
+        
+        // Delete finished saga instances from the repository
         // SetCompletedWhenFinalized();
-
-
+        
         // Initially(
         //     When(CommunicationEvent)
         //         .InitializeSaga()
@@ -81,27 +79,24 @@ public sealed class CommunicationStateMachine : MassTransitStateMachine<Communic
         //     Ignore(CustomerValidationResponseEvent),
         //     Ignore(TaxesCalculationResponseEvent),
         //     Ignore(FaultEvent));
-        //
-        // // Delete finished saga instances from the repository
-        // SetCompletedWhenFinalized();
     }
 
     private void CorrelateEvents()
     {
         Event(() => CommunicationEvent, x => x
             // .CorrelateById(m => m.Message.Id)
-            .CorrelateById(m => m.StateId,  m => m.Message.Id)
+            .CorrelateById(m => m.StateId, m => m.Message.Id)
             .SelectId(m => NewId.NextGuid())
             // .SelectId(m => m.Message.Id)
             .OnMissingInstance(m => m.Discard()));
 
         Event(() => PushStatusEvent, x => x
-            .CorrelateById(m => m.StateId,  m => m.Message.Id)
+            .CorrelateById(m => m.StateId, m => m.Message.Id)
             // .CorrelateById(m => m.Message.Id)
             // .SelectId(m => m.Message.Id)
             .OnMissingInstance(m => m.Fault()));
-        
-        
+
+
         // Event(() => TaxesCalculationResponseEvent, x => x
         //     .CorrelateById(m => m.CorrelationId ?? new Guid())
         //     .SelectId(m => m.CorrelationId ?? new Guid())
